@@ -22,14 +22,24 @@
         android:layout_width="0dp"
         android:layout_weight="1" />
   </LinearLayout>
-  <ImageView 
-      android:layout_height="wrap_content" 
-      android:layout_width="wrap_content" 
-      android:visibility="visible"
-      android:id="@+id/imageView1" />
-  <VideoView 
-      android:layout_height="wrap_content" 
-      android:layout_width="wrap_content" 
-      android:visibility="invisible"
-      android:id="@+id/videoView1" />
+
+   <TextView
+       android:id="@+id/textView1"
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:text="Large Text"
+       android:textAppearance="?android:attr/textAppearanceLarge" />
+
+   <ImageView
+       android:id="@+id/imageView1"
+       android:layout_width="match_parent"
+       android:layout_height="378dp"
+       android:visibility="visible" />
+
+   <VideoView
+       android:id="@+id/videoView1"
+       android:layout_width="290dp"
+       android:layout_height="254dp"
+       android:visibility="invisible" />
+
 </LinearLayout>

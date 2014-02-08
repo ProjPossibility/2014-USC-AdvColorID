@@ -22,8 +22,11 @@ import android.provider.MediaStore;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.View.OnTouchListener;
 import android.widget.Button;
+
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.VideoView;
 
 
@@ -42,6 +45,8 @@ public class PhotoIntentActivity extends Activity {
 	private static final String VIDEOVIEW_VISIBILITY_STORAGE_KEY = "videoviewvisibility";
 	private VideoView mVideoView;
 	private Uri mVideoUri;
+	
+	private TextView textView;
 
 	private String mCurrentPhotoPath;
 
@@ -56,6 +61,7 @@ public class PhotoIntentActivity extends Activity {
 	/* Photo album for this application */
 	private String getAlbumName() {
 		return getString(R.string.album_name);
+	
 	}
 
 	
@@ -139,7 +145,15 @@ public class PhotoIntentActivity extends Activity {
 	private Bitmap procBitmapedBitmap(Bitmap src){
 		 Bitmap dest = Bitmap.createBitmap(
 	                src.getWidth(), src.getHeight(), src.getConfig());
-		
+		mImageView.setOnTouchListener(new OnTouchListener() {
+		    public boolean onTouch(View v, MotionEvent event) {
+		        // ... Respond to touch events      
+		    	eventX = (int)event.getX();
+	             eventY = (int)event.getY();
+	             textView.setText("x="+eventX+" y="+eventY);
+		        return true;
+		        }
+		});
 		 for(int x = 0; x < src.getWidth(); x++){
 	            for(int y = 0; y < src.getHeight(); y++){
 		 
@@ -152,8 +166,10 @@ public class PhotoIntentActivity extends Activity {
 	                int pixelGreen = Color.green(pixelColor);
 	                int pixelBlue = Color.blue(pixelColor);
 					// перемешаем цвета
+	               // int newPixel= Color.argb(
+	               //         pixelAlpha, pixelBlue, pixelRed, pixelGreen);
 	                int newPixel= Color.argb(
-	                        pixelAlpha, pixelBlue, pixelRed, pixelGreen);
+	                        255, pixelRed,pixelGreen, pixelBlue);
 					// полученный результат вернём в Bitmap		
 	                dest.setPixel(x, y, newPixel);
 	            }
@@ -169,6 +185,10 @@ public class PhotoIntentActivity extends Activity {
 	             eventX = (int)event.getX();
 	             eventY = (int)event.getY();
 	     }
+	    // int eventX = mImageView.getWidth();
+			//int eventY = mImageView.getHeight();
+	     
+	    // textView.setText("W="+eventX+" H="+eventY);
 		return false;
 		}
 	 
@@ -270,9 +290,10 @@ public class PhotoIntentActivity extends Activity {
 
 		mImageView = (ImageView) findViewById(R.id.imageView1);
 		mVideoView = (VideoView) findViewById(R.id.videoView1);
+		textView = (TextView) findViewById(R.id.textView1);
 		mImageBitmap = null;
 		mVideoUri = null;
-
+  
 		Button picBtn = (Button) findViewById(R.id.btnIntend);
 		setBtnListenerOrDisable( 
 				picBtn, 
