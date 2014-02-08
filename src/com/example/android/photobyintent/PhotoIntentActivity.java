@@ -13,12 +13,14 @@ import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -47,6 +49,8 @@ public class PhotoIntentActivity extends Activity {
 	private static final String JPEG_FILE_SUFFIX = ".jpg";
 
 	private AlbumStorageDirFactory mAlbumStorageDirFactory = null;
+	private int eventX;
+	private int eventY;
 
 	
 	/* Photo album for this application */
@@ -124,7 +128,7 @@ public class PhotoIntentActivity extends Activity {
 
 		/* Decode the JPEG file into a Bitmap */
 		Bitmap bitmap = BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions);
-		
+		bitmap = procBitmapedBitmap(bitmap);
 		/* Associate the Bitmap to the ImageView */
 		mImageView.setImageBitmap(bitmap);
 		mVideoUri = null;
@@ -132,6 +136,42 @@ public class PhotoIntentActivity extends Activity {
 		mVideoView.setVisibility(View.INVISIBLE);
 	}
 
+	private Bitmap procBitmapedBitmap(Bitmap src){
+		 Bitmap dest = Bitmap.createBitmap(
+	                src.getWidth(), src.getHeight(), src.getConfig());
+		
+		 for(int x = 0; x < src.getWidth(); x++){
+	            for(int y = 0; y < src.getHeight(); y++){
+		 
+				    // получим каждый пиксель
+	                int pixelColor = src.getPixel(x, y);
+					// получим информацию о прозрачности
+	                int pixelAlpha = Color.alpha(pixelColor);
+					// получим цвет каждого пикселя
+	                int pixelRed = Color.red(pixelColor);
+	                int pixelGreen = Color.green(pixelColor);
+	                int pixelBlue = Color.blue(pixelColor);
+					// перемешаем цвета
+	                int newPixel= Color.argb(
+	                        pixelAlpha, pixelBlue, pixelRed, pixelGreen);
+					// полученный результат вернём в Bitmap		
+	                dest.setPixel(x, y, newPixel);
+	            }
+	        }
+	        return dest;
+		//return null;
+	}
+	
+	 @Override
+	 public boolean onTouchEvent(MotionEvent event) {
+	     switch ( event.getAction() ) {
+	         case MotionEvent.ACTION_DOWN:
+	             eventX = (int)event.getX();
+	             eventY = (int)event.getY();
+	     }
+		return false;
+		}
+	 
 	private void galleryAddPic() {
 		    Intent mediaScanIntent = new Intent("android.intent.action.MEDIA_SCANNER_SCAN_FILE");
 			File f = new File(mCurrentPhotoPath);
