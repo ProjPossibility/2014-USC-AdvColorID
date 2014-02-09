@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
@@ -23,6 +24,9 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.speech.tts.TextToSpeech;
+import android.speech.tts.TextToSpeech.OnInitListener;
+import android.text.TextUtils;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
@@ -30,6 +34,7 @@ import android.widget.Button;
 
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.VideoView;
 
 
@@ -54,6 +59,7 @@ public class PhotoIntentActivity extends Activity {
 	private TextView textView3;
 	private TextView textView4;
 	private TextView textView5;
+	TextToSpeech tts ;
 
 	private String mCurrentPhotoPath;
 
@@ -188,6 +194,7 @@ public class PhotoIntentActivity extends Activity {
 	            		String ss="";
 	            		try {
 							 ss = proceedComputation(pixelRed, pixelGreen, pixelBlue);
+							  //tts.speak(ss, TextToSpeech.QUEUE_FLUSH, null);
 						} catch (XmlPullParserException e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
@@ -230,28 +237,75 @@ public class PhotoIntentActivity extends Activity {
 	
 	
 	private String proceedComputation(int vR, int vG, int vB) throws XmlPullParserException, IOException{
-		/*create an ArrayList object*/
-       int massive[] = new int[12];
+		String curColor = "";
+		
+		try {
+        int sum1 = 0, sum2 = 0;
+        String starttag = "";
         int i = 0;
         int pixelRed = vR;
         int pixelGreen = vG;
         int pixelBlue = vB;
-        String curColor = "";
-		XmlPullParser parser = getResources().getXml(R.xml.rgbx11);
-		while (parser.getEventType()!= XmlPullParser.END_DOCUMENT) {
-			if (parser.getEventType() == XmlPullParser.START_TAG && parser.getName().equals("color")) {
-				massive [i] = pixelRed - Integer.parseInt(parser.getAttributeValue(2)) + pixelGreen - Integer.parseInt(parser.getAttributeValue(3)) + pixelBlue - Integer.parseInt(parser.getAttributeValue(4));
-				if (i == 0){
-					curColor = parser.getAttributeValue(1);
-				}else{
-					if (massive[i] < massive[i-1]){
-						curColor = parser.getAttributeValue(1);
-					}
-				}
+        String na = "";
+        int r = 0;
+        int g = 0;
+        int b = 0;
+        final String LOG_TAG = "myLogs";
+        
+        XmlPullParser parser = getResources().getXml(R.color.rgb);
+        
+        String str="";
+        while (parser.getEventType()!= XmlPullParser.END_DOCUMENT) {
+        	switch (parser.getEventType()) {
+        	 case XmlPullParser.START_TAG:{
+        		 starttag = parser.getName();
+        		 break;}
+        	case XmlPullParser.TEXT:{
+        		 if (starttag.equals("name")){
+        			 na = parser.getText();
+        		 }
+        		 if (starttag.equals("r")){
+        			 r = Integer.parseInt(parser.getText());
+        		 }
+        		 if (starttag.equals("g")){
+        			 g = Integer.parseInt(parser.getText());
+        		 }
+        		 if (starttag.equals("b")){
+        			 b = Integer.parseInt(parser.getText());
+        		 }
+        		 break;}
+        	
+        	 case XmlPullParser.END_TAG:{
+        		 if (parser.getName().equals("b")){
+        			 sum2 = Math.abs(vR - r) + Math.abs(vG - g) + Math.abs(vB - b);
+        			 int k = i;
+        			 if (k !=0 ){
+        				 k = i-1 ;
+        			 }else{
+        				 sum1 = sum2;
+        			 }
+        			 
+        		 if (sum2 < sum1){
+        			// curColor = curColor+" "+r+" "+g+" "+b+" ";
+        			 curColor = /*curColor+" CCC= "+*/na;
+        			 sum1 = sum2;
+        		 }
+        		 i=i+1;
+        		 }
+        		 break;}
+        	 default:break;
+        	}
+        	parser.next();
 			}
-			parser.next();
+			
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			curColor="error";
+			e.printStackTrace();
 		}
-		return curColor;
+		finally {
+			return curColor;
+		}
 	}
 
 	 @Override
@@ -358,6 +412,8 @@ public class PhotoIntentActivity extends Activity {
 		}
 	};
 
+	
+	 
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -371,6 +427,7 @@ public class PhotoIntentActivity extends Activity {
 		textView3 = (TextView) findViewById(R.id.textView3);
 		textView4 = (TextView) findViewById(R.id.textView4);
 		textView5 = (TextView) findViewById(R.id.textView5);
+		// tts = new TextToSpeech(this, (OnInitListener) this);
 		mImageBitmap = null;
 		mVideoUri = null;
   
