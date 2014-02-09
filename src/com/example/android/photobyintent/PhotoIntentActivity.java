@@ -47,6 +47,7 @@ public class PhotoIntentActivity extends Activity {
 	private Uri mVideoUri;
 	
 	private TextView textView;
+	private TextView textView2;
 
 	private String mCurrentPhotoPath;
 
@@ -142,7 +143,7 @@ public class PhotoIntentActivity extends Activity {
 		mVideoView.setVisibility(View.INVISIBLE);
 	}
 
-	private Bitmap procBitmapedBitmap(Bitmap src){
+	private Bitmap procBitmapedBitmap(final Bitmap src){
 		 Bitmap dest = Bitmap.createBitmap(
 	                src.getWidth(), src.getHeight(), src.getConfig());
 		mImageView.setOnTouchListener(new OnTouchListener() {
@@ -150,7 +151,18 @@ public class PhotoIntentActivity extends Activity {
 		        // ... Respond to touch events      
 		    	eventX = (int)event.getX();
 	             eventY = (int)event.getY();
+	            if (!((eventX<0)&&(eventY<0))){
 	             textView.setText("x="+eventX+" y="+eventY);
+	             
+	             Integer pixelColor = src.getPixel(eventX, eventY);
+	             if (!(pixelColor.equals(null))){
+	             int pixelRed = Color.red(pixelColor);
+	                int pixelGreen = Color.green(pixelColor);
+	                int pixelBlue = Color.blue(pixelColor);
+	               
+	                textView2.setText("R="+pixelRed+" G="+pixelGreen+" B="+pixelBlue);
+	             }}
+	             
 		        return true;
 		        }
 		});
@@ -165,6 +177,7 @@ public class PhotoIntentActivity extends Activity {
 	                int pixelRed = Color.red(pixelColor);
 	                int pixelGreen = Color.green(pixelColor);
 	                int pixelBlue = Color.blue(pixelColor);
+	                textView2.setText("R="+pixelRed+" G="+pixelGreen+" B="+pixelBlue);
 					// перемешаем цвета
 	               // int newPixel= Color.argb(
 	               //         pixelAlpha, pixelBlue, pixelRed, pixelGreen);
@@ -291,6 +304,7 @@ public class PhotoIntentActivity extends Activity {
 		mImageView = (ImageView) findViewById(R.id.imageView1);
 		mVideoView = (VideoView) findViewById(R.id.videoView1);
 		textView = (TextView) findViewById(R.id.textView1);
+		textView2 = (TextView) findViewById(R.id.textView2);
 		mImageBitmap = null;
 		mVideoUri = null;
   
