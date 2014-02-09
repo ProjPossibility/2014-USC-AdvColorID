@@ -6,6 +6,9 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
+import org.xmlpull.v1.XmlPullParser;
+import org.xmlpull.v1.XmlPullParserException;
+
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -48,6 +51,9 @@ public class PhotoIntentActivity extends Activity {
 	
 	private TextView textView;
 	private TextView textView2;
+	private TextView textView3;
+	private TextView textView4;
+	private TextView textView5;
 
 	private String mCurrentPhotoPath;
 
@@ -57,7 +63,8 @@ public class PhotoIntentActivity extends Activity {
 	private AlbumStorageDirFactory mAlbumStorageDirFactory = null;
 	private int eventX;
 	private int eventY;
-
+	int scaleFactor;
+	
 	
 	/* Photo album for this application */
 	private String getAlbumName() {
@@ -114,60 +121,89 @@ public class PhotoIntentActivity extends Activity {
 		/* Get the size of the ImageView */
 		int targetW = mImageView.getWidth();
 		int targetH = mImageView.getHeight();
-
+	
 		/* Get the size of the image */
 		BitmapFactory.Options bmOptions = new BitmapFactory.Options();
-		bmOptions.inJustDecodeBounds = true;
+		//bmOptions.inJustDecodeBounds = true;
+		bmOptions.inJustDecodeBounds = false;
+		
 		BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions);
 		int photoW = bmOptions.outWidth;
 		int photoH = bmOptions.outHeight;
 		
 		/* Figure out which way needs to be reduced less */
-		int scaleFactor = 1;
+		scaleFactor = 1;
 		if ((targetW > 0) || (targetH > 0)) {
 			scaleFactor = Math.min(photoW/targetW, photoH/targetH);	
+			
 		}
 
 		/* Set bitmap options to scale the image decode target */
 		bmOptions.inJustDecodeBounds = false;
 		bmOptions.inSampleSize = scaleFactor;
+		//bmOptions.inSampleSize = 3;
 		bmOptions.inPurgeable = true;
+		textView4.setText(textView4.getText()+" sF="+scaleFactor);
+	//	bmOptions.inScaled = true;
+		
 
 		/* Decode the JPEG file into a Bitmap */
 		Bitmap bitmap = BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions);
-		bitmap = procBitmapedBitmap(bitmap);
+		bitmap=procBitmapedBitmap(bitmap);
 		/* Associate the Bitmap to the ImageView */
 		mImageView.setImageBitmap(bitmap);
+		//mImageView.buildDrawingCache();
+		// bitmap = mImageView.getDrawingCache();
+		// mImageView.destroyDrawingCache();
+		//
+		textView4.setText(textView4.getText()+"viewW="+mImageView.getWidth()+" viewH="+mImageView.getHeight());
+		
 		mVideoUri = null;
 		mImageView.setVisibility(View.VISIBLE);
 		mVideoView.setVisibility(View.INVISIBLE);
 	}
 
 	private Bitmap procBitmapedBitmap(final Bitmap src){
-		 Bitmap dest = Bitmap.createBitmap(
-	                src.getWidth(), src.getHeight(), src.getConfig());
-		mImageView.setOnTouchListener(new OnTouchListener() {
-		    public boolean onTouch(View v, MotionEvent event) {
-		        // ... Respond to touch events      
-		    	eventX = (int)event.getX();
-	             eventY = (int)event.getY();
-	            if (!((eventX<0)&&(eventY<0))){
-	             textView.setText("x="+eventX+" y="+eventY);
+		 final Bitmap dest = Bitmap.createBitmap(
+	                720, 540, src.getConfig());
+		 
+		 textView3.setText("srcW="+dest.getWidth()+" srcH="+ dest.getHeight());
+		 mImageView.setOnTouchListener(new OnTouchListener() {
+			 public boolean onTouch(View v, MotionEvent event) {
+				 
+				 eventX = (int) event.getX();
+	            eventY = (int) event.getY();
+	    
+	            if (((eventX>=0)&&(eventY>=0)&&(eventX<dest.getWidth())&&(eventY<dest.getHeight()))){
+	            	textView.setText("x="+eventX+" y="+eventY);
 	             
-	             Integer pixelColor = src.getPixel(eventX, eventY);
-	             if (!(pixelColor.equals(null))){
-	             int pixelRed = Color.red(pixelColor);
-	                int pixelGreen = Color.green(pixelColor);
-	                int pixelBlue = Color.blue(pixelColor);
-	               
-	                textView2.setText("R="+pixelRed+" G="+pixelGreen+" B="+pixelBlue);
-	             }}
+	            	int pixelColor = dest.getPixel(eventX, eventY);
+	            	//if (!(pixelColor.equals(null))){
+	            		int pixelAlpha = Color.alpha(pixelColor);
+	            		int pixelRed = Color.red(pixelColor);
+	            		int pixelGreen = Color.green(pixelColor);
+	            		int pixelBlue = Color.blue(pixelColor);
+	            		
+	            		textView2.setText("R="+pixelRed+" G="+pixelGreen+" B="+pixelBlue);
+	            		String ss="";
+	            		try {
+							 ss = proceedComputation(pixelRed, pixelGreen, pixelBlue);
+						} catch (XmlPullParserException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						} catch (IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+	            		textView5.setText("Color is "+ss);
+	            	//}
+	            }
 	             
 		        return true;
 		        }
 		});
-		 for(int x = 0; x < src.getWidth(); x++){
-	            for(int y = 0; y < src.getHeight(); y++){
+		 for(int x = 0; x < 720; x++){
+	            for(int y = 0; y < 540; y++){
 		 
 				    // получим каждый пиксель
 	                int pixelColor = src.getPixel(x, y);
@@ -177,20 +213,47 @@ public class PhotoIntentActivity extends Activity {
 	                int pixelRed = Color.red(pixelColor);
 	                int pixelGreen = Color.green(pixelColor);
 	                int pixelBlue = Color.blue(pixelColor);
-	                textView2.setText("R="+pixelRed+" G="+pixelGreen+" B="+pixelBlue);
+	                
 					// перемешаем цвета
 	               // int newPixel= Color.argb(
 	               //         pixelAlpha, pixelBlue, pixelRed, pixelGreen);
 	                int newPixel= Color.argb(
-	                        255, pixelRed,pixelGreen, pixelBlue);
+	                		pixelAlpha, pixelRed,pixelGreen, pixelBlue);
 					// полученный результат вернём в Bitmap		
 	                dest.setPixel(x, y, newPixel);
 	            }
 	        }
+		 
 	        return dest;
 		//return null;
 	}
 	
+	
+	private String proceedComputation(int vR, int vG, int vB) throws XmlPullParserException, IOException{
+		/*create an ArrayList object*/
+       int massive[] = new int[12];
+        int i = 0;
+        int pixelRed = vR;
+        int pixelGreen = vG;
+        int pixelBlue = vB;
+        String curColor = "";
+		XmlPullParser parser = getResources().getXml(R.xml.rgbx11);
+		while (parser.getEventType()!= XmlPullParser.END_DOCUMENT) {
+			if (parser.getEventType() == XmlPullParser.START_TAG && parser.getName().equals("color")) {
+				massive [i] = pixelRed - Integer.parseInt(parser.getAttributeValue(2)) + pixelGreen - Integer.parseInt(parser.getAttributeValue(3)) + pixelBlue - Integer.parseInt(parser.getAttributeValue(4));
+				if (i == 0){
+					curColor = parser.getAttributeValue(1);
+				}else{
+					if (massive[i] < massive[i-1]){
+						curColor = parser.getAttributeValue(1);
+					}
+				}
+			}
+			parser.next();
+		}
+		return curColor;
+	}
+
 	 @Override
 	 public boolean onTouchEvent(MotionEvent event) {
 	     switch ( event.getAction() ) {
@@ -305,6 +368,9 @@ public class PhotoIntentActivity extends Activity {
 		mVideoView = (VideoView) findViewById(R.id.videoView1);
 		textView = (TextView) findViewById(R.id.textView1);
 		textView2 = (TextView) findViewById(R.id.textView2);
+		textView3 = (TextView) findViewById(R.id.textView3);
+		textView4 = (TextView) findViewById(R.id.textView4);
+		textView5 = (TextView) findViewById(R.id.textView5);
 		mImageBitmap = null;
 		mVideoUri = null;
   

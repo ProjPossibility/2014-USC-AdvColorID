@@ -1,56 +1,83 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    >
-   <LinearLayout 
-   android:orientation="horizontal"
-   android:layout_height="wrap_content"
-   android:layout_width="match_parent"
-   >
-    <Button android:text="@string/btnIntend" android:id="@+id/btnIntend"
+    android:orientation="vertical" >
+
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_width="0dp"
-        android:layout_weight="1" />
-    <Button android:text="@string/btnIntendS" android:id="@+id/btnIntendS"
+        android:orientation="horizontal" >
+
+        <Button
+            android:id="@+id/btnIntend"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/btnIntend" />
+
+        <Button
+            android:id="@+id/btnIntendS"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/btnIntendS" />
+
+        <Button
+            android:id="@+id/btnIntendV"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/btnIntendV" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/textView1"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_width="0dp"
-        android:layout_weight="1" />
+        android:text="Large Text"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
 
-    <Button
-        android:id="@+id/btnIntendV"
-        android:layout_width="0dp"
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:text="@string/btnIntendV" />
+        android:text="Small Text"
+        android:textAppearance="?android:attr/textAppearanceSmall" />
 
-  </LinearLayout>
+    <TextView
+        android:id="@+id/textView3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Small Text"
+        android:textAppearance="?android:attr/textAppearanceSmall" />
 
-   <TextView
-       android:id="@+id/textView1"
-       android:layout_width="wrap_content"
-       android:layout_height="wrap_content"
-       android:text="Large Text"
-       android:textAppearance="?android:attr/textAppearanceLarge" />
+    <TextView
+        android:id="@+id/textView4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Small Text"
+        android:textAppearance="?android:attr/textAppearanceSmall" />
 
-   <TextView
-       android:id="@+id/textView2"
-       android:layout_width="wrap_content"
-       android:layout_height="wrap_content"
-       android:text="Small Text"
-       android:textAppearance="?android:attr/textAppearanceSmall" />
+    <TextView
+        android:id="@+id/textView5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Medium Text"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
 
-   <ImageView
-       android:id="@+id/imageView1"
-       android:layout_width="fill_parent"
-       android:layout_height="wrap_content"
-       android:visibility="visible" />
+    <ImageView
+        android:id="@+id/imageView1"
+        android:layout_width="match_parent"
+        android:layout_height="540px"
+        android:scaleType="fitStart"
+       
+        android:visibility="visible" />
 
-   <VideoView
-       android:id="@+id/videoView1"
-       android:layout_width="61dp"
-       android:layout_height="50dp"
-       android:visibility="invisible" />
+    <VideoView
+        android:id="@+id/videoView1"
+        android:layout_width="77dp"
+        android:layout_height="106dp"
+        android:visibility="invisible" />
 
 </LinearLayout>
